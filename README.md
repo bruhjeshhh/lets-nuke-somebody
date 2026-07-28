@@ -1,4 +1,4 @@
-# Territoria
+#Let's Nuke Somebody
 
 A turn-based grand strategy game, played in the terminal.
 

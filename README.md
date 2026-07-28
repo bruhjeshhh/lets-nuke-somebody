@@ -1,4 +1,4 @@
-##Let's Nuke Somebody
+## Let's Nuke Somebody
 
 A turn-based grand strategy game, played in the terminal.
 

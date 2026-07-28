@@ -1,0 +1,182 @@
+[
+  {
+    "name": "United States",
+    "population": 331000000,
+    "territory_size": 9834000,
+    "gold": 5000,
+    "troops": 12000,
+    "owner": "ai",
+    "neighbors": ["Canada", "Mexico"]
+  },
+  {
+    "name": "Canada",
+    "population": 38000000,
+    "territory_size": 9985000,
+    "gold": 3200,
+    "troops": 4000,
+    "owner": "ai",
+    "neighbors": ["United States"]
+  },
+  {
+    "name": "Mexico",
+    "population": 128000000,
+    "territory_size": 1964000,
+    "gold": 2200,
+    "troops": 5000,
+    "owner": "ai",
+    "neighbors": ["United States"]
+  },
+  {
+    "name": "Brazil",
+    "population": 212000000,
+    "territory_size": 8516000,
+    "gold": 3000,
+    "troops": 7000,
+    "owner": "ai",
+    "neighbors": ["Argentina"]
+  },
+  {
+    "name": "Argentina",
+    "population": 45000000,
+    "territory_size": 2780000,
+    "gold": 1800,
+    "troops": 3500,
+    "owner": "ai",
+    "neighbors": ["Brazil"]
+  },
+  {
+    "name": "United Kingdom",
+    "population": 67000000,
+    "territory_size": 244000,
+    "gold": 4200,
+    "troops": 4500,
+    "owner": "ai",
+    "neighbors": ["France"]
+  },
+  {
+    "name": "France",
+    "population": 65000000,
+    "territory_size": 551000,
+    "gold": 4000,
+    "troops": 4300,
+    "owner": "ai",
+    "neighbors": ["United Kingdom", "Germany", "Spain", "Italy"]
+  },
+  {
+    "name": "Germany",
+    "population": 83000000,
+    "territory_size": 357000,
+    "gold": 4600,
+    "troops": 4800,
+    "owner": "ai",
+    "neighbors": ["France", "Poland"]
+  },
+  {
+    "name": "Spain",
+    "population": 47000000,
+    "territory_size": 505000,
+    "gold": 2600,
+    "troops": 3000,
+    "owner": "ai",
+    "neighbors": ["France"]
+  },
+  {
+    "name": "Italy",
+    "population": 59000000,
+    "territory_size": 301000,
+    "gold": 2700,
+    "troops": 3100,
+    "owner": "ai",
+    "neighbors": ["France"]
+  },
+  {
+    "name": "Poland",
+    "population": 38000000,
+    "territory_size": 313000,
+    "gold": 2000,
+    "troops": 2800,
+    "owner": "ai",
+    "neighbors": ["Germany", "Russia"]
+  },
+  {
+    "name": "Russia",
+    "population": 144000000,
+    "territory_size": 17098000,
+    "gold": 3800,
+    "troops": 9000,
+    "owner": "ai",
+    "neighbors": ["Poland", "China"]
+  },
+  {
+    "name": "China",
+    "population": 1412000000,
+    "territory_size": 9597000,
+    "gold": 6000,
+    "troops": 15000,
+    "owner": "ai",
+    "neighbors": ["Russia", "India", "South Korea"]
+  },
+  {
+    "name": "India",
+    "population": 1408000000,
+    "territory_size": 3287000,
+    "gold": 4400,
+    "troops": 11000,
+    "owner": "ai",
+    "neighbors": ["China"]
+  },
+  {
+    "name": "Japan",
+    "population": 125000000,
+    "territory_size": 378000,
+    "gold": 5200,
+    "troops": 5000,
+    "owner": "ai",
+    "neighbors": ["South Korea"]
+  },
+  {
+    "name": "South Korea",
+    "population": 52000000,
+    "territory_size": 100000,
+    "gold": 3400,
+    "troops": 3600,
+    "owner": "ai",
+    "neighbors": ["Japan", "China"]
+  },
+  {
+    "name": "Australia",
+    "population": 26000000,
+    "territory_size": 7692000,
+    "gold": 2900,
+    "troops": 2500,
+    "owner": "ai",
+    "neighbors": []
+  },
+  {
+    "name": "Egypt",
+    "population": 104000000,
+    "territory_size": 1002000,
+    "gold": 1600,
+    "troops": 3200,
+    "owner": "ai",
+    "neighbors": []
+  },
+  {
+    "name": "South Africa",
+    "population": 60000000,
+    "territory_size": 1221000,
+    "gold": 2100,
+    "troops": 2900,
+    "owner": "ai",
+    "neighbors": []
+  },
+  {
+    "name": "Nigeria",
+    "population": 213000000,
+    "territory_size": 923000,
+    "gold": 1400,
+    "troops": 3300,
+    "owner": "ai",
+    "neighbors": []
+  }
+]

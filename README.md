@@ -1,11 +1,15 @@
-## Let's Nuke Somebody
+# Territoria
 
 A turn-based grand strategy game, played in the terminal.
 
-This is **Phase 1: World Setup** — the project foundation. It covers
-loading the world, picking a starting country, and a bare turn counter.
-No combat, economy, diplomacy, or AI behavior yet; those are later phases
-built on top of this scaffolding.
+**Phase 1: World Setup** laid the foundation - loading the world, picking
+a starting country, and a bare turn counter.
+
+**Phase 2: Economy & Turn Engine** (current) makes turns meaningful:
+every country - player and AI alike - grows population, earns gold, and
+recruits troops each turn, all through one configurable engine. Combat
+and diplomacy are still not implemented; those are later phases built on
+top of this scaffolding.
 
 ## Running it
 
@@ -27,8 +31,9 @@ go run . -data path/to/countries.json
 | `help`               | List available commands                            |
 | `countries`          | List every country in the world and its owner      |
 | `select <country>`   | Choose your starting country (one-time)            |
-| `stats`              | Show detailed info for your country                |
-| `end`                | End the current turn and advance to the next       |
+| `stats`              | Show detailed info for your country, including income |
+| `leaderboard`        | Show the richest and strongest countries in the world |
+| `end`                | Run one turn of economy for every country, then advance |
 | `quit`               | Exit the game                                      |
 
 ## Architecture
@@ -37,8 +42,9 @@ The project is split so that game rules never depend on how they're
 rendered:
 
 ```
-internal/game/   Pure game logic: data model, state, command execution.
-                 No terminal/IO concerns — testable in isolation.
+internal/game/   Pure game logic: data model, state, economy engine,
+                 command execution. No terminal/IO concerns — testable
+                 in isolation.
 
 internal/tui/    Bubble Tea model. Only talks to internal/game through
                  its public API (game.Execute, game.State). Owns all
@@ -54,6 +60,25 @@ data/            JSON world data. countries.json is the seed dataset;
 This separation is what will let future phases (combat, economy, AI
 behavior, diplomacy) grow inside `internal/game` without ever touching
 the rendering layer, and vice versa.
+
+## Economy
+
+Every turn, `internal/game/economy.go` runs the same process for every
+country - player and AI, with no special-casing:
+
+1. Population grows by a fixed percentage (`PopulationGrowthRate`).
+2. Population and territory are converted into "economic points"
+   (`PopulationUnit`, `TerritoryUnit` control the scale).
+3. Gold income and troop recruitment are each a configurable rate times
+   those points.
+
+All of these live in `EconomyConfig` (see `DefaultEconomyConfig`), so
+balancing the game is a config change, not a code change.
+
+Adding a new resource later (oil, steel, uranium, ...) means: add a rate
+field to `EconomyConfig`, add the matching balance field to `Country`,
+and add one line to `Apply()` — nothing else in the engine or UI needs
+to change shape.
 
 ## Data model
 

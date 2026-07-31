@@ -20,7 +20,8 @@ var helpText = []string{
 	"  countries         List every country in the world and its owner",
 	"  select <country>  Choose your starting country (one-time)",
 	"  stats             Show detailed info for your country",
-	"  end               End the current turn and advance to the next",
+	"  leaderboard       Show the richest and strongest countries",
+	"  end               End the current turn: economy runs, then advance",
 	"  quit              Exit the game",
 }
 
@@ -62,9 +63,11 @@ func Execute(s *State, line string) CommandResult {
 	case "stats":
 		return CommandResult{Lines: showStats(s)}
 
+	case "leaderboard":
+		return CommandResult{Lines: showLeaderboard(s)}
+
 	case "end":
-		turn := s.EndTurn()
-		return CommandResult{Lines: []string{fmt.Sprintf("Turn ended. It is now turn %d.", turn)}}
+		return CommandResult{Lines: showTurnSummary(s.EndTurn())}
 
 	case "quit", "exit":
 		return CommandResult{Lines: []string{"Goodbye."}, Quit: true}
@@ -99,6 +102,7 @@ func showStats(s *State) []string {
 		return []string{"You haven't selected a country yet. Use 'select <country>' first."}
 	}
 	c := s.Countries[s.PlayerCountry]
+	goldIncome, troopIncome := ProjectIncome(c, s.Economy)
 
 	neighbors := "none"
 	if len(c.Neighbors) > 0 {
@@ -107,12 +111,65 @@ func showStats(s *State) []string {
 
 	return []string{
 		fmt.Sprintf("=== %s ===", c.Name),
-		fmt.Sprintf("Population:     %d", c.Population),
-		fmt.Sprintf("Territory Size: %d km^2", c.TerritorySize),
-		fmt.Sprintf("Gold:           %d", c.Gold),
-		fmt.Sprintf("Troops:         %d", c.Troops),
-		fmt.Sprintf("Owner:          %s", c.Owner),
-		fmt.Sprintf("Neighbors:      %s", neighbors),
-		fmt.Sprintf("Current Turn:   %d", s.Turn),
+		fmt.Sprintf("Population:              %d", c.Population),
+		fmt.Sprintf("Territory:               %d km^2", c.TerritorySize),
+		fmt.Sprintf("Gold:                    %d", c.Gold),
+		fmt.Sprintf("Gold Income / Turn:      +%d", goldIncome),
+		fmt.Sprintf("Troops:                  %d", c.Troops),
+		fmt.Sprintf("Troop Recruitment / Turn: +%d", troopIncome),
+		fmt.Sprintf("Owner:                   %s", c.Owner),
+		fmt.Sprintf("Neighbors:               %s", neighbors),
+		fmt.Sprintf("Current Turn:            %d", s.Turn),
 	}
+}
+
+// showLeaderboard renders the top countries by treasury and by troop
+// count. Ties break alphabetically so results are deterministic.
+func showLeaderboard(s *State) []string {
+	const topN = 5
+
+	lines := []string{fmt.Sprintf("=== Leaderboard (Turn %d) ===", s.Turn), "", "Richest countries (gold):"}
+	for i, c := range s.RankedByGold() {
+		if i >= topN {
+			break
+		}
+		lines = append(lines, fmt.Sprintf("  %d. %-20s %d gold%s", i+1, c.Name, c.Gold, ownerTag(c)))
+	}
+
+	lines = append(lines, "", "Strongest countries (troops):")
+	for i, c := range s.RankedByTroops() {
+		if i >= topN {
+			break
+		}
+		lines = append(lines, fmt.Sprintf("  %d. %-20s %d troops%s", i+1, c.Name, c.Troops, ownerTag(c)))
+	}
+
+	return lines
+}
+
+// showTurnSummary formats the result of State.EndTurn into readable
+// event lines: turn advanced, then (if the player has a country)
+// population/gold/troop deltas for that turn.
+func showTurnSummary(summary TurnSummary) []string {
+	lines := []string{fmt.Sprintf("Turn advanced. It is now turn %d.", summary.Turn)}
+
+	if summary.PlayerCountry == "" {
+		lines = append(lines, "(Select a country with 'select <country>' to see your own turn events.)")
+		return lines
+	}
+
+	r := summary.Result
+	lines = append(lines,
+		fmt.Sprintf("Population increased by %d.", r.PopulationGrowth),
+		fmt.Sprintf("Gold earned: +%d.", r.GoldEarned),
+		fmt.Sprintf("Troops recruited: +%d.", r.TroopsRecruited),
+	)
+	return lines
+}
+
+func ownerTag(c *Country) string {
+	if c.Owner == OwnerPlayer {
+		return "  [YOU]"
+	}
+	return ""
 }

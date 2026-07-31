@@ -60,6 +60,7 @@ func New(s *game.State) Model {
 		log: []string{
 			"Territoria - World Setup",
 			"Type 'countries' to see the world, then 'select <country>' to begin.",
+			"Each 'end' grows your population, gold, and troops - try 'leaderboard' to see how you stack up.",
 			"",
 		},
 	}

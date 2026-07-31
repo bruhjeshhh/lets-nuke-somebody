@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -16,15 +17,18 @@ type State struct {
 	Order         []string // stable display order, matches source data file
 	PlayerCountry string   // empty until the player has selected one
 	Turn          int
+	Economy       EconomyConfig
 }
 
 // NewState builds a fresh game state from a set of loaded countries.
-// Turn starts at 1 and no country is assigned to the player yet.
+// Turn starts at 1, no country is assigned to the player yet, and the
+// economy is set to its default (but freely tunable) balance.
 func NewState(countries map[string]*Country, order []string) *State {
 	return &State{
 		Countries: countries,
 		Order:     order,
 		Turn:      1,
+		Economy:   DefaultEconomyConfig(),
 	}
 }
 
@@ -75,10 +79,59 @@ func (s *State) PlayerHasSelected() bool {
 	return s.PlayerCountry != ""
 }
 
-// EndTurn advances the game by one turn. Phase 1 has no simulation to run
-// yet, so this is currently just a counter increment - the seam where
-// economy/AI/combat resolution will hook in later.
-func (s *State) EndTurn() int {
+// TurnSummary reports what happened on a completed turn, focused on the
+// player's country (AI countries run through the identical economy but
+// aren't individually reported on here - see Leaderboard for the
+// world-wide view).
+type TurnSummary struct {
+	Turn          int
+	PlayerCountry string // empty if the player hasn't selected a country yet
+	Result        TurnResult
+}
+
+// EndTurn advances the game by one turn and runs one round of economy
+// (population growth, gold income, troop recruitment) for every country
+// in the world - player and AI alike, via the same Apply function, so
+// there's no special-casing between them.
+func (s *State) EndTurn() TurnSummary {
 	s.Turn++
-	return s.Turn
+
+	summary := TurnSummary{Turn: s.Turn}
+	for _, name := range s.Order {
+		c := s.Countries[name]
+		result := Apply(c, s.Economy)
+		if name == s.PlayerCountry {
+			summary.PlayerCountry = name
+			summary.Result = result
+		}
+	}
+	return summary
+}
+
+// RankedByGold returns every country ordered richest-to-poorest.
+func (s *State) RankedByGold() []*Country {
+	return s.ranked(func(c *Country) int64 { return int64(c.Gold) })
+}
+
+// RankedByTroops returns every country ordered strongest-to-weakest by
+// troop count.
+func (s *State) RankedByTroops() []*Country {
+	return s.ranked(func(c *Country) int64 { return int64(c.Troops) })
+}
+
+// ranked returns all countries sorted descending by the given metric,
+// breaking ties by name so ordering is deterministic.
+func (s *State) ranked(metric func(*Country) int64) []*Country {
+	countries := make([]*Country, 0, len(s.Order))
+	for _, name := range s.Order {
+		countries = append(countries, s.Countries[name])
+	}
+	sort.Slice(countries, func(i, j int) bool {
+		mi, mj := metric(countries[i]), metric(countries[j])
+		if mi != mj {
+			return mi > mj
+		}
+		return countries[i].Name < countries[j].Name
+	})
+	return countries
 }

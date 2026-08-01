@@ -18,17 +18,26 @@ type State struct {
 	PlayerCountry string   // empty until the player has selected one
 	Turn          int
 	Economy       EconomyConfig
+
+	// Units is the catalog of purchasable unit types (loaded once from
+	// units.json), keyed by ID. UnitOrder preserves source file order
+	// for stable display, same pattern as Countries/Order.
+	Units     map[string]*UnitType
+	UnitOrder []string
 }
 
-// NewState builds a fresh game state from a set of loaded countries.
-// Turn starts at 1, no country is assigned to the player yet, and the
-// economy is set to its default (but freely tunable) balance.
-func NewState(countries map[string]*Country, order []string) *State {
+// NewState builds a fresh game state from a set of loaded countries and
+// a catalog of unit types. Turn starts at 1, no country is assigned to
+// the player yet, and the economy is set to its default (but freely
+// tunable) balance.
+func NewState(countries map[string]*Country, order []string, units map[string]*UnitType, unitOrder []string) *State {
 	return &State{
 		Countries: countries,
 		Order:     order,
 		Turn:      1,
 		Economy:   DefaultEconomyConfig(),
+		Units:     units,
+		UnitOrder: unitOrder,
 	}
 }
 
@@ -117,6 +126,16 @@ func (s *State) RankedByGold() []*Country {
 // troop count.
 func (s *State) RankedByTroops() []*Country {
 	return s.ranked(func(c *Country) int64 { return int64(c.Troops) })
+}
+
+// RankedByMilitaryPower returns every country ordered by total military
+// strength (attack + defense across all owned units) - this is the
+// unit-based combat metric, distinct from raw troop count.
+func (s *State) RankedByMilitaryPower() []*Country {
+	return s.ranked(func(c *Country) int64 {
+		attack, defense, _ := s.MilitaryPower(c)
+		return int64(attack + defense)
+	})
 }
 
 // ranked returns all countries sorted descending by the given metric,

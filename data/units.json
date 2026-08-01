@@ -1,0 +1,42 @@
+[
+  {
+    "id": "infantry",
+    "name": "Infantry",
+    "attack": 2,
+    "defense": 3,
+    "cost": { "gold": 50, "oil": 0, "steel": 0 },
+    "maintenance": { "gold": 1, "oil": 0, "steel": 0 }
+  },
+  {
+    "id": "tanks",
+    "name": "Tanks",
+    "attack": 9,
+    "defense": 6,
+    "cost": { "gold": 200, "oil": 0, "steel": 100 },
+    "maintenance": { "gold": 4, "oil": 1, "steel": 1 }
+  },
+  {
+    "id": "artillery",
+    "name": "Artillery",
+    "attack": 12,
+    "defense": 3,
+    "cost": { "gold": 150, "oil": 0, "steel": 90 },
+    "maintenance": { "gold": 3, "oil": 0, "steel": 1 }
+  },
+  {
+    "id": "fighters",
+    "name": "Fighters",
+    "attack": 16,
+    "defense": 8,
+    "cost": { "gold": 400, "oil": 100, "steel": 150 },
+    "maintenance": { "gold": 8, "oil": 3, "steel": 1 }
+  },
+  {
+    "id": "destroyers",
+    "name": "Destroyers",
+    "attack": 22,
+    "defense": 16,
+    "cost": { "gold": 800, "oil": 200, "steel": 300 },
+    "maintenance": { "gold": 15, "oil": 5, "steel": 2 }
+  }
+]

@@ -4,179 +4,239 @@
     "population": 331000000,
     "territory_size": 9834000,
     "gold": 5000,
+    "oil": 1200,
+    "steel": 1200,
     "troops": 12000,
     "owner": "ai",
-    "neighbors": ["Canada", "Mexico"]
+    "neighbors": ["Canada", "Mexico"],
+    "resource_multipliers": { "gold": 1.1, "oil": 1.3, "steel": 1.2 }
   },
   {
     "name": "Canada",
     "population": 38000000,
     "territory_size": 9985000,
     "gold": 3200,
+    "oil": 1400,
+    "steel": 900,
     "troops": 4000,
     "owner": "ai",
-    "neighbors": ["United States"]
+    "neighbors": ["United States"],
+    "resource_multipliers": { "gold": 1.0, "oil": 1.6, "steel": 1.1 }
   },
   {
     "name": "Mexico",
     "population": 128000000,
     "territory_size": 1964000,
     "gold": 2200,
+    "oil": 900,
+    "steel": 600,
     "troops": 5000,
     "owner": "ai",
-    "neighbors": ["United States"]
+    "neighbors": ["United States"],
+    "resource_multipliers": { "gold": 1.0, "oil": 1.3, "steel": 0.9 }
   },
   {
     "name": "Brazil",
     "population": 212000000,
     "territory_size": 8516000,
     "gold": 3000,
+    "oil": 700,
+    "steel": 1000,
     "troops": 7000,
     "owner": "ai",
-    "neighbors": ["Argentina"]
+    "neighbors": ["Argentina"],
+    "resource_multipliers": { "gold": 1.0, "oil": 0.9, "steel": 1.2 }
   },
   {
     "name": "Argentina",
     "population": 45000000,
     "territory_size": 2780000,
     "gold": 1800,
+    "oil": 400,
+    "steel": 500,
     "troops": 3500,
     "owner": "ai",
-    "neighbors": ["Brazil"]
+    "neighbors": ["Brazil"],
+    "resource_multipliers": { "gold": 1.0, "oil": 0.8, "steel": 0.8 }
   },
   {
     "name": "United Kingdom",
     "population": 67000000,
     "territory_size": 244000,
     "gold": 4200,
+    "oil": 800,
+    "steel": 700,
     "troops": 4500,
     "owner": "ai",
-    "neighbors": ["France"]
+    "neighbors": ["France"],
+    "resource_multipliers": { "gold": 1.1, "oil": 1.1, "steel": 1.0 }
   },
   {
     "name": "France",
     "population": 65000000,
     "territory_size": 551000,
     "gold": 4000,
+    "oil": 500,
+    "steel": 800,
     "troops": 4300,
     "owner": "ai",
-    "neighbors": ["United Kingdom", "Germany", "Spain", "Italy"]
+    "neighbors": ["United Kingdom", "Germany", "Spain", "Italy"],
+    "resource_multipliers": { "gold": 1.0, "oil": 0.8, "steel": 1.0 }
   },
   {
     "name": "Germany",
     "population": 83000000,
     "territory_size": 357000,
     "gold": 4600,
+    "oil": 400,
+    "steel": 1500,
     "troops": 4800,
     "owner": "ai",
-    "neighbors": ["France", "Poland"]
+    "neighbors": ["France", "Poland"],
+    "resource_multipliers": { "gold": 1.0, "oil": 0.6, "steel": 1.5 }
   },
   {
     "name": "Spain",
     "population": 47000000,
     "territory_size": 505000,
     "gold": 2600,
+    "oil": 400,
+    "steel": 600,
     "troops": 3000,
     "owner": "ai",
-    "neighbors": ["France"]
+    "neighbors": ["France"],
+    "resource_multipliers": { "gold": 0.9, "oil": 0.6, "steel": 0.8 }
   },
   {
     "name": "Italy",
     "population": 59000000,
     "territory_size": 301000,
     "gold": 2700,
+    "oil": 400,
+    "steel": 700,
     "troops": 3100,
     "owner": "ai",
-    "neighbors": ["France"]
+    "neighbors": ["France"],
+    "resource_multipliers": { "gold": 0.9, "oil": 0.6, "steel": 0.9 }
   },
   {
     "name": "Poland",
     "population": 38000000,
     "territory_size": 313000,
     "gold": 2000,
+    "oil": 400,
+    "steel": 1100,
     "troops": 2800,
     "owner": "ai",
-    "neighbors": ["Germany", "Russia"]
+    "neighbors": ["Germany", "Russia"],
+    "resource_multipliers": { "gold": 0.9, "oil": 0.6, "steel": 1.3 }
   },
   {
     "name": "Russia",
     "population": 144000000,
     "territory_size": 17098000,
     "gold": 3800,
+    "oil": 2000,
+    "steel": 1600,
     "troops": 9000,
     "owner": "ai",
-    "neighbors": ["Poland", "China"]
+    "neighbors": ["Poland", "China"],
+    "resource_multipliers": { "gold": 1.0, "oil": 1.8, "steel": 1.4 }
   },
   {
     "name": "China",
     "population": 1412000000,
     "territory_size": 9597000,
     "gold": 6000,
+    "oil": 1200,
+    "steel": 2200,
     "troops": 15000,
     "owner": "ai",
-    "neighbors": ["Russia", "India", "South Korea"]
+    "neighbors": ["Russia", "India", "South Korea"],
+    "resource_multipliers": { "gold": 1.0, "oil": 1.0, "steel": 1.7 }
   },
   {
     "name": "India",
     "population": 1408000000,
     "territory_size": 3287000,
     "gold": 4400,
+    "oil": 700,
+    "steel": 900,
     "troops": 11000,
     "owner": "ai",
-    "neighbors": ["China"]
+    "neighbors": ["China"],
+    "resource_multipliers": { "gold": 1.0, "oil": 0.7, "steel": 0.9 }
   },
   {
     "name": "Japan",
     "population": 125000000,
     "territory_size": 378000,
     "gold": 5200,
+    "oil": 200,
+    "steel": 1400,
     "troops": 5000,
     "owner": "ai",
-    "neighbors": ["South Korea"]
+    "neighbors": ["South Korea"],
+    "resource_multipliers": { "gold": 1.1, "oil": 0.3, "steel": 1.5 }
   },
   {
     "name": "South Korea",
     "population": 52000000,
     "territory_size": 100000,
     "gold": 3400,
+    "oil": 200,
+    "steel": 1100,
     "troops": 3600,
     "owner": "ai",
-    "neighbors": ["Japan", "China"]
+    "neighbors": ["Japan", "China"],
+    "resource_multipliers": { "gold": 1.0, "oil": 0.3, "steel": 1.4 }
   },
   {
     "name": "Australia",
     "population": 26000000,
     "territory_size": 7692000,
     "gold": 2900,
+    "oil": 600,
+    "steel": 1500,
     "troops": 2500,
     "owner": "ai",
-    "neighbors": []
+    "neighbors": [],
+    "resource_multipliers": { "gold": 1.0, "oil": 0.9, "steel": 1.6 }
   },
   {
     "name": "Egypt",
     "population": 104000000,
     "territory_size": 1002000,
     "gold": 1600,
+    "oil": 800,
+    "steel": 600,
     "troops": 3200,
     "owner": "ai",
-    "neighbors": []
+    "neighbors": [],
+    "resource_multipliers": { "gold": 0.9, "oil": 1.1, "steel": 0.8 }
   },
   {
     "name": "South Africa",
     "population": 60000000,
     "territory_size": 1221000,
     "gold": 2100,
+    "oil": 400,
+    "steel": 1400,
     "troops": 2900,
     "owner": "ai",
-    "neighbors": []
+    "neighbors": [],
+    "resource_multipliers": { "gold": 0.9, "oil": 0.7, "steel": 1.5 }
   },
   {
     "name": "Nigeria",
     "population": 213000000,
     "territory_size": 923000,
     "gold": 1400,
+    "oil": 1600,
+    "steel": 400,
     "troops": 3300,
     "owner": "ai",
-    "neighbors": []
+    "neighbors": [],
+    "resource_multipliers": { "gold": 0.8, "oil": 1.7, "steel": 0.6 }
   }
 ]

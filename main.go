@@ -19,6 +19,7 @@ import (
 
 func main() {
 	dataPath := flag.String("data", "data/countries.json", "path to the country data JSON file")
+	unitsPath := flag.String("units", "data/units.json", "path to the unit type JSON file")
 	flag.Parse()
 
 	countries, order, err := game.LoadCountries(*dataPath)
@@ -27,7 +28,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	state := game.NewState(countries, order)
+	units, unitOrder, err := game.LoadUnitTypes(*unitsPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to load unit types: %v\n", err)
+		os.Exit(1)
+	}
+
+	state := game.NewState(countries, order, units, unitOrder)
 	model := tui.New(state)
 
 	program := tea.NewProgram(model)

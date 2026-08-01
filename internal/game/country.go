@@ -25,9 +25,25 @@ type Country struct {
 	Population    int64    `json:"population"`
 	TerritorySize int      `json:"territory_size"`
 	Gold          int      `json:"gold"`
+	Oil           int      `json:"oil"`
+	Steel         int      `json:"steel"`
 	Troops        int      `json:"troops"`
 	Owner         Owner    `json:"owner"`
 	Neighbors     []string `json:"neighbors"`
+
+	// ResourceMultipliers scales the base economy formulas per resource,
+	// so a country's real-world strengths (e.g. an oil producer, an
+	// industrial/steel power) are reflected without hardcoding any
+	// per-country logic into the economy engine itself. A zero-value
+	// (all three fields unset in the source JSON) is treated as an
+	// even {1, 1, 1} baseline - see LoadCountries.
+	ResourceMultipliers ResourceRates `json:"resource_multipliers"`
+
+	// Units maps a unit type ID (matching UnitType.ID in units.json,
+	// e.g. "tanks") to how many of that unit this country currently
+	// owns. Missing entries mean zero, so most countries can omit this
+	// entirely in the source JSON.
+	Units map[string]int `json:"units,omitempty"`
 }
 
 // LoadCountries reads a JSON array of countries from path and returns them
@@ -61,6 +77,12 @@ func LoadCountries(path string) (map[string]*Country, []string, error) {
 		}
 		if c.Owner == "" {
 			c.Owner = OwnerAI
+		}
+		if c.ResourceMultipliers == (ResourceRates{}) {
+			c.ResourceMultipliers = ResourceRates{Gold: 1, Oil: 1, Steel: 1}
+		}
+		if c.Units == nil {
+			c.Units = map[string]int{}
 		}
 		countryCopy := c
 		countries[c.Name] = &countryCopy

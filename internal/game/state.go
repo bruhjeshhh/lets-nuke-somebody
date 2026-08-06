@@ -29,14 +29,15 @@ type State struct {
 
 // NewState builds a fresh game state from a set of loaded countries and
 // a catalog of unit types. Turn starts at 1, no country is assigned to
-// the player yet, and the economy is set to its default (but freely
-// tunable) balance.
+// the player yet, and the economy/combat balance are set to their
+// defaults (but freely tunable).
 func NewState(countries map[string]*Country, order []string, units map[string]*UnitType, unitOrder []string) *State {
 	return &State{
 		Countries: countries,
 		Order:     order,
 		Turn:      1,
 		Economy:   DefaultEconomyConfig(),
+		Combat:    DefaultCombatConfig(),
 		Units:     units,
 		UnitOrder: unitOrder,
 	}
@@ -102,7 +103,9 @@ type TurnSummary struct {
 // EndTurn advances the game by one turn and runs one round of economy
 // (population growth, gold income, troop recruitment) for every country
 // in the world - player and AI alike, via the same Apply function, so
-// there's no special-casing between them.
+// there's no special-casing between them. AI countries then spend a
+// share of their income automatically recruiting troops; the player
+// recruits manually via the 'recruit' command instead.
 func (s *State) EndTurn() TurnSummary {
 	s.Turn++
 
@@ -115,6 +118,7 @@ func (s *State) EndTurn() TurnSummary {
 			summary.Result = result
 		}
 	}
+	s.aiAutoRecruit()
 	return summary
 }
 

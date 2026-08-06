@@ -62,6 +62,7 @@ func New(s *game.State) Model {
 			"Type 'countries' to see the world, then 'select <country>' to begin.",
 			"Each 'end' grows your population, gold, oil, and steel - try 'leaderboard' to see how you stack up.",
 			"Use 'resources' to check your stockpile, and 'build <unit> <amount>' to buy units.",
+			"'recruit <amount>' buys troops, 'attack <country>' conquers a neighbor, 'map' shows your empire.",
 			"",
 		},
 	}

@@ -23,6 +23,9 @@ var helpText = []string{
 	"  stats                   Show your country's full status, including military",
 	"  resources               Show your resource stockpile and income per turn",
 	"  build <unit> <amount>   Purchase units (infantry, tanks, artillery, fighters, destroyers)",
+	"  recruit <amount>        Recruit troops with gold",
+	"  attack <country>        Attack a neighboring country",
+	"  map                     Show world ownership - your empire vs. everyone else",
 	"  leaderboard             Show the richest and strongest countries",
 	"  end                     End the current turn: economy runs, then advance",
 	"  quit                    Exit the game",
@@ -72,6 +75,15 @@ func Execute(s *State, line string) CommandResult {
 	case "build":
 		return CommandResult{Lines: buildUnits(s, args)}
 
+	case "recruit":
+		return CommandResult{Lines: recruitTroops(s, args)}
+
+	case "attack":
+		return CommandResult{Lines: attackCountry(s, args)}
+
+	case "map":
+		return CommandResult{Lines: showMap(s)}
+
 	case "leaderboard":
 		return CommandResult{Lines: showLeaderboard(s)}
 
@@ -119,6 +131,12 @@ func showStats(s *State) []string {
 		neighbors = strings.Join(c.Neighbors, ", ")
 	}
 
+	owned := s.PlayerOwnedCountries()
+	ownedNames := make([]string, len(owned))
+	for i, o := range owned {
+		ownedNames[i] = o.Name
+	}
+
 	lines := []string{
 		fmt.Sprintf("=== %s ===", c.Name),
 		fmt.Sprintf("Population:          %d", c.Population),
@@ -140,6 +158,7 @@ func showStats(s *State) []string {
 		"",
 		fmt.Sprintf("Owner:               %s", c.Owner),
 		fmt.Sprintf("Neighbors:           %s", neighbors),
+		fmt.Sprintf("Countries you control (%d): %s", len(ownedNames), strings.Join(ownedNames, ", ")),
 		fmt.Sprintf("Current Turn:        %d", s.Turn),
 	)
 	return lines
@@ -202,6 +221,105 @@ func buildUnits(s *State, args []string) []string {
 		fmt.Sprintf("Built %d %s for %s.", amount, unit.Name, formatBundle(cost)),
 		fmt.Sprintf("%s now has %d %s.", s.PlayerCountry, s.Countries[s.PlayerCountry].Units[unit.ID], unit.Name),
 	}
+}
+
+// recruitTroops handles "recruit <amount>": buys troops for the
+// player's own country with gold.
+func recruitTroops(s *State, args []string) []string {
+	if !s.PlayerHasSelected() {
+		return []string{"You haven't selected a country yet. Use 'select <country>' first."}
+	}
+	if len(args) != 1 {
+		return []string{"Usage: recruit <amount> (e.g. 'recruit 500')"}
+	}
+
+	amount, err := strconv.Atoi(args[0])
+	if err != nil {
+		return []string{fmt.Sprintf("Amount must be a whole number, got %q.", args[0])}
+	}
+
+	cost, err := s.RecruitTroops(s.PlayerCountry, amount)
+	if err != nil {
+		return []string{"Error: " + err.Error()}
+	}
+
+	c := s.Countries[s.PlayerCountry]
+	return []string{
+		fmt.Sprintf("Recruited %d troops for %d gold.", amount, cost),
+		fmt.Sprintf("%s now has %d troops and %d gold.", c.Name, c.Troops, c.Gold),
+	}
+}
+
+// attackCountry handles "attack <country>": launches an attack from the
+// player's country against a named, adjacent target.
+func attackCountry(s *State, args []string) []string {
+	if !s.PlayerHasSelected() {
+		return []string{"You haven't selected a country yet. Use 'select <country>' first."}
+	}
+	if len(args) == 0 {
+		return []string{"Usage: attack <country>"}
+	}
+
+	target := strings.Join(args, " ")
+	report, err := s.Attack(target)
+	if err != nil {
+		return []string{"Error: " + err.Error()}
+	}
+	return formatBattleReport(report)
+}
+
+func formatBattleReport(r BattleReport) []string {
+	lines := []string{
+		"=== Battle Report ===",
+		fmt.Sprintf("Attacker: %-20s troops committed: %d", r.Attacker, r.AttackerTroopsCommitted),
+		fmt.Sprintf("Defender: %-20s troops committed: %d", r.Defender, r.DefenderTroopsCommitted),
+		"",
+		fmt.Sprintf("Casualties - %s: %d, %s: %d", r.Attacker, r.AttackerCasualties, r.Defender, r.DefenderCasualties),
+		fmt.Sprintf("Troops remaining - %s: %d, %s: %d", r.Attacker, r.AttackerTroopsRemaining, r.Defender, r.DefenderTroopsRemaining),
+		"",
+		fmt.Sprintf("Winner: %s", r.Winner),
+	}
+	if r.Winner == r.Attacker {
+		lines = append(lines, fmt.Sprintf("Territory captured: %d km^2. %s is now under your control.", r.TerritoryCaptured, r.Defender))
+	} else {
+		lines = append(lines, fmt.Sprintf("The attack was repelled - %s holds its territory.", r.Defender))
+	}
+	return lines
+}
+
+// showMap renders a text-based view of world ownership: the player's
+// empire first, then the rest of the world, each with territory size -
+// there's no geometric/pixel map in this CLI, so this is the "does the
+// map reflect new ownership" view.
+func showMap(s *State) []string {
+	owned := s.PlayerOwnedCountries()
+	lines := []string{fmt.Sprintf("=== World Map (Turn %d) ===", s.Turn), ""}
+
+	if len(owned) == 0 {
+		lines = append(lines, "You don't control any territory yet - use 'select <country>' to begin.")
+	} else {
+		totalTerritory := 0
+		lines = append(lines, "Your empire:")
+		for _, c := range owned {
+			lines = append(lines, fmt.Sprintf("  %-20s %d km^2", c.Name, c.TerritorySize))
+			totalTerritory += c.TerritorySize
+		}
+		lines = append(lines, fmt.Sprintf("  (total: %d km^2 across %d countries)", totalTerritory, len(owned)))
+	}
+
+	lines = append(lines, "", "Rest of the world:")
+	names := make([]string, len(s.Order))
+	copy(names, s.Order)
+	sort.Strings(names)
+	for _, n := range names {
+		c := s.Countries[n]
+		if c.Owner == OwnerPlayer {
+			continue
+		}
+		lines = append(lines, fmt.Sprintf("  %-20s %d km^2 [AI]", c.Name, c.TerritorySize))
+	}
+
+	return lines
 }
 
 // showLeaderboard renders the top countries by treasury, standing army

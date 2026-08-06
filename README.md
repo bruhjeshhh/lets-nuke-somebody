@@ -9,14 +9,18 @@ a starting country, and a bare turn counter.
 player and AI alike - grows population, earns gold, and recruits troops
 each turn, all through one configurable engine.
 
+**Phase 3: Military & Combat** adds troop recruitment and conquest:
+attack a neighboring country, resolve the battle by troop count, and
+capture its territory on a win. AI countries recruit automatically;
+they don't attack yet.
+
 **Phase 4: Resources & Military Units** (current) expands the economy to
 three resources (Gold, Oil, Steel) with per-country production profiles,
 and introduces five purchasable unit types (Infantry, Tanks, Artillery,
-Fighters, Destroyers) with unit-based combat strength. Actual combat
-(attacking a neighbor, territory changing hands) and diplomacy are still
-not implemented - this phase gives the engine everything a future combat
-system needs (attack/defense totals, resource-gated production) without
-yet wiring up an attack command.
+Fighters, Destroyers) with a unit-based strength calculation
+(`State.MilitaryPower`). Combat resolution itself still runs on troop
+count only (see Combat below for why, and how the two connect) -
+diplomacy remains unimplemented.
 
 ## Running it
 
@@ -41,6 +45,9 @@ go run . -data path/to/countries.json -units path/to/units.json
 | `stats`                        | Show your country's full status, including military        |
 | `resources`                    | Show your resource stockpile and income per turn            |
 | `build <unit> <amount>`        | Purchase units (infantry, tanks, artillery, fighters, destroyers) |
+| `recruit <amount>`             | Recruit troops with gold                                   |
+| `attack <country>`             | Attack a neighboring country                                |
+| `map`                          | Show world ownership - your empire vs. everyone else        |
 | `leaderboard`                  | Show the richest, largest, and strongest countries          |
 | `end`                          | Run one turn of economy for every country, then advance     |
 | `quit`                         | Exit the game                                               |
@@ -52,8 +59,9 @@ rendered:
 
 ```
 internal/game/   Pure game logic: data model, state, economy engine,
-                 military/unit system, command execution. No terminal/
-                 IO concerns — testable in isolation.
+                 military/unit system, combat/conquest, command
+                 execution. No terminal/IO concerns — testable in
+                 isolation.
 
 internal/tui/    Bubble Tea model. Only talks to internal/game through
                  its public API (game.Execute, game.State). Owns all
@@ -112,11 +120,47 @@ engine has no hardcoded unit names or stats:
 
 Maintenance costs are calculated and displayed (in `stats`) but are
 **not yet auto-deducted** each turn - wiring maintenance upkeep into
-`EndTurn` is a natural next step once combat gives players a reason to
-balance army size against income.
+`EndTurn` is a natural next step once army size becomes something
+players have to balance against income.
 
-AI countries currently produce resources but don't purchase units -
-AI military behavior is out of scope for this phase, same as combat.
+AI countries produce resources and auto-recruit troops (see Combat
+below) but don't purchase units yet - AI unit-buying behavior is a
+natural extension once combat also considers unit strength.
+
+## Combat
+
+`internal/game/combat.go` implements recruitment and conquest:
+
+- `recruit <amount>` buys troops for the player's country at a
+  configurable gold-per-troop rate (`CombatConfig.GoldPerTroop`). AI
+  countries recruit automatically each turn, spending a configurable
+  fraction of their gold (`AIRecruitGoldFraction`) the same way - see
+  `State.aiAutoRecruit`, called from `EndTurn`.
+- `attack <country>` can only target a country adjacent to the
+  player's - `Only neighboring countries can be attacked` is enforced
+  by checking the attacker's `Neighbors` list.
+- Combat strength is **troop count only** (`CombatStrength`), per this
+  phase's spec. It's deliberately factored into its own one-line
+  function rather than inlined into `Attack`, specifically so folding
+  in the unit-based `State.MilitaryPower` from Phase 4 later is a
+  change to `CombatStrength` alone, not to `Attack`'s control flow.
+- Both sides take casualties every battle (`WinnerCasualtyRate`,
+  `LoserCasualtyRate`) regardless of outcome - the winner just loses
+  less. Ties favor the defender.
+- A winning attacker gains the defender's territory (`Owner` flips to
+  `player`) and absorbs its neighbor connections, so conquest chains
+  outward through captured ground on future attacks rather than
+  dead-ending at your original borders.
+- There's no province/tile subdivision in this data model - each
+  country is one indivisible territory, so a single battle either
+  fully captures a country or doesn't touch it at all. That's the
+  "Simple Version" the spec asked for; a granular front-line/partial-
+  territory model would be a larger data model change for a later
+  phase.
+- The player's home country (`State.PlayerCountry`) is the sole
+  attacker/troop pool for now - conquered countries join "countries
+  you control" (see `stats`/`map`) but don't independently recruit or
+  launch attacks yet.
 
 ## Data model
 

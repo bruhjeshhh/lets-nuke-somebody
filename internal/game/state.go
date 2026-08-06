@@ -18,6 +18,7 @@ type State struct {
 	PlayerCountry string   // empty until the player has selected one
 	Turn          int
 	Economy       EconomyConfig
+	Combat        CombatConfig
 
 	// Units is the catalog of purchasable unit types (loaded once from
 	// units.json), keyed by ID. UnitOrder preserves source file order
